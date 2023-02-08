@@ -10,8 +10,6 @@ import { useProduct } from '@hooks/useProduct'
 
 import { Feather } from '@expo/vector-icons'
 
-import { adData, DATA } from '@screens/PreviewAd'
-
 import { AdDetails } from '@components/AdDetails'
 import { RNSwiper } from '@components/RNSwiper'
 import { Header } from '@components/Header'
@@ -30,8 +28,7 @@ type RouteParams = {
 
 export function MyAdDetails() {
   const [loading, setLoading] = useState(false)
-  // const [product, setProduct] = useState<ProductDetails>({} as ProductDetails)
-  const [updatedProduct, setUpdatedProduct] = useState<ProductDetails>(
+  const [currentProduct, setCurrentProduct] = useState<ProductDetails>(
     {} as ProductDetails
   )
 
@@ -39,8 +36,7 @@ export function MyAdDetails() {
   const route = useRoute()
   const { productId, product } = route.params as RouteParams
 
-  const { refreshedToken, authToken } = useAuth()
-  const { products } = useProduct()
+  const { authToken, refreshedToken } = useAuth()
 
   const toast = useToast()
 
@@ -50,7 +46,6 @@ export function MyAdDetails() {
 
   async function handleDisableAd() {
     setLoading(true)
-
     try {
       await api.patch(`products/${productId}`, { is_active: false })
 
@@ -60,7 +55,7 @@ export function MyAdDetails() {
         bgColor: 'green.500'
       })
 
-      setUpdatedProduct({ ...updatedProduct, is_active: false })
+      setCurrentProduct({ ...currentProduct, is_active: false })
     } catch (error) {
       const isAppError = error instanceof AppError
       const title = isAppError
@@ -88,7 +83,7 @@ export function MyAdDetails() {
         bgColor: 'green.500'
       })
 
-      setUpdatedProduct({ ...updatedProduct, is_active: true })
+      setCurrentProduct({ ...currentProduct, is_active: true })
     } catch (error) {
       const isAppError = error instanceof AppError
       const title = isAppError
@@ -106,6 +101,7 @@ export function MyAdDetails() {
   }
 
   async function handleDeleteAd() {
+    setLoading(true)
     try {
     } catch (error) {
       const isAppError = error instanceof AppError
@@ -118,15 +114,16 @@ export function MyAdDetails() {
         placement: 'top',
         bgColor: 'red.500'
       })
+    } finally {
+      setLoading(false)
     }
   }
 
-  function fetchAdDetails() {
+  async function fetchAdDetails() {
     setLoading(true)
     try {
-      // const response = await api.get(`/products/${productId}`)
-      // setUpdatedProduct(response.data)
-      setUpdatedProduct(product)
+      const response = await api.get(`/products/${productId}`)
+      setCurrentProduct(response.data)
     } catch (error) {
       const isAppError = error instanceof AppError
       const title = isAppError
@@ -146,10 +143,12 @@ export function MyAdDetails() {
   useFocusEffect(
     useCallback(() => {
       fetchAdDetails()
-    }, [])
+    }, [authToken, currentProduct.is_active])
   )
 
-  console.log(updatedProduct)
+  console.log('ID:', productId)
+
+  console.log('Current Product:', currentProduct)
 
   return (
     <>
@@ -157,32 +156,32 @@ export function MyAdDetails() {
         <Header onPressBackButton={handleGoBack} hasIcon />
       </Box>
       <ScrollView>
-        {!product || loading ? (
+        {!currentProduct || loading ? (
           <Loading />
         ) : (
           <>
             <RNSwiper
-              data={product.product_images}
-              disabledAd={!product.is_active ? true : false}
+              data={currentProduct.product_images}
+              disabledAd={!currentProduct.is_active ? true : false}
             />
 
             <VStack px={6} py={5}>
-              <AdDetails data={product} />
+              <AdDetails data={currentProduct} />
 
               <VStack mt={8}>
                 <Button
                   title={
-                    !updatedProduct.is_active
+                    !currentProduct.is_active
                       ? 'Reativar anúncio'
                       : 'Desativar anúncio'
                   }
                   mb={2}
-                  variant={!product.is_active ? 'blue' : 'black'}
+                  variant={!currentProduct.is_active ? 'blue' : 'black'}
                   hasIcon
                   iconType={Feather}
                   iconName="power"
                   onPress={
-                    !product.is_active ? handleEnableAd : handleDisableAd
+                    !currentProduct.is_active ? handleEnableAd : handleDisableAd
                   }
                   isLoading={loading}
                 />
