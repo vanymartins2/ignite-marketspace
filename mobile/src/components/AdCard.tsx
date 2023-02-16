@@ -1,21 +1,37 @@
-import { Box, HStack, Image, Pressable, Text, VStack } from 'native-base'
+import {
+  Box,
+  HStack,
+  Image,
+  IPressableProps,
+  Pressable,
+  Text,
+  VStack
+} from 'native-base'
 
-import { UserPhoto } from '@components/UserPhoto'
+import { ProductDetails } from '@dtos/productResponseDTO'
 
 import userImg from '@assets/userDefault.png'
 import bicicleImg from '@assets/bicicle.png'
 
-type Props = {
-  onPress: () => void
+import { UserPhoto } from '@components/UserPhoto'
+import { api } from '@services/api'
+
+type Props = IPressableProps & {
+  item: ProductDetails
+  hasUserPhoto?: boolean
 }
 
-export function AdCard({ onPress }: Props) {
+export function AdCard({ item, hasUserPhoto = true, ...rest }: Props) {
   return (
-    <Pressable onPress={onPress}>
+    <Pressable {...rest}>
       <VStack mr={5} mt={6}>
-        <Box>
+        <Box flexShrink={1}>
           <Image
-            source={bicicleImg}
+            source={{
+              uri: `${api.defaults.baseURL}/images/${item.product_images[0].path}`
+            }}
+            width={153}
+            height={100}
             alt="Imagem do anúncio"
             resizeMode="contain"
             borderRadius="md"
@@ -23,25 +39,43 @@ export function AdCard({ onPress }: Props) {
 
           <HStack position="absolute" px={1} py={1}>
             <Box flex={1}>
-              <UserPhoto
-                source={userImg}
-                size={6}
-                alt="Foto do usuário"
-                borderSize={1}
-                color="gray.700"
-              />
+              {hasUserPhoto && (
+                <UserPhoto
+                  source={
+                    !item.user.avatar
+                      ? userImg
+                      : {
+                          uri: `${api.defaults.baseURL}/images/${item.user.avatar}`
+                        }
+                  }
+                  size={6}
+                  alt="Foto do usuário"
+                  borderSize={1}
+                  color="gray.700"
+                />
+              )}
             </Box>
 
-            <Box bgColor="gray.200" px={4} py={1} borderRadius="2xl">
-              <Text fontSize="xs" fontFamily="heading" color="white">
-                NOVO
+            <Box
+              bgColor={item.is_new ? 'blue.700' : 'gray.200'}
+              px={4}
+              py={1}
+              borderRadius="2xl"
+            >
+              <Text
+                fontSize="xs"
+                fontFamily="heading"
+                color="white"
+                textTransform="uppercase"
+              >
+                {item.is_new ? 'novo' : 'usado'}
               </Text>
             </Box>
           </HStack>
         </Box>
 
         <Text fontSize="sm" fontFamily="body" color="gray.200">
-          Bicicleta
+          {item?.name}
         </Text>
 
         <HStack alignItems="center">
@@ -49,7 +83,7 @@ export function AdCard({ onPress }: Props) {
             R$
           </Text>
           <Text fontSize="md" fontFamily="heading" color="gray.100">
-            59,90
+            {(item?.price / 100).toFixed(2).replace('.', ',')}
           </Text>
         </HStack>
       </VStack>

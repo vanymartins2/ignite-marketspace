@@ -15,11 +15,14 @@ type AppStackRoutes = {
   home: undefined
   new: undefined
   edit: undefined
-  details: undefined
-  preview: { productId: string }
+  details: {
+    id: string
+  }
+  preview: {
+    productId: string
+  }
   'my-ad-details': {
     productId: string
-    product: ProductDetails
   }
 }
 

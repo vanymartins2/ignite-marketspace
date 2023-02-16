@@ -17,8 +17,10 @@ type ProductContextProviderProps = {
 
 export type ProductContextDataProps = {
   products: ProductDetails[]
+  loadProductFromStorage: () => void
   saveImagesInStorage: (images: ProductImageDTO[]) => Promise<void>
   removeProductFromStorage: (id: string) => Promise<void>
+  editProductInStorage: (id: string, status: boolean) => void
   saveProductInStorage: (productData: ProductDetails) => Promise<void>
   removeImagesFromStorage: (ids: string[]) => Promise<void>
 }
@@ -50,6 +52,19 @@ export function ProductContextProvider({
       await storageProductRemove(id)
     } catch (error) {
       throw error
+    }
+  }
+
+  function editProductInStorage(id: string, status: boolean) {
+    const foundProduct = products.find(product => product.id === id)
+
+    if (foundProduct) {
+      const updatedProduct = {
+        ...foundProduct,
+        is_active: status
+      }
+
+      setProducts(prevState => [...prevState, updatedProduct])
     }
   }
 
@@ -87,10 +102,12 @@ export function ProductContextProvider({
     <ProductContext.Provider
       value={{
         products,
+        loadProductFromStorage,
         saveImagesInStorage,
         removeImagesFromStorage,
         saveProductInStorage,
-        removeProductFromStorage
+        removeProductFromStorage,
+        editProductInStorage
       }}
     >
       {children}

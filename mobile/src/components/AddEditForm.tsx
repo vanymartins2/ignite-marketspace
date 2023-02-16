@@ -156,7 +156,6 @@ export function AddEditForm() {
 
   async function handleFormSubmit(data: AdFormData) {
     setIsLoading(true)
-    setIsSubmitSuccessful(true)
 
     try {
       if (photos.length === 0) {
@@ -167,16 +166,19 @@ export function AddEditForm() {
         })
       }
 
-      data.price = data.price * 100
       data.is_new = Boolean(data.is_new)
+      data.price = Number(data.price * 100)
       if (data.accept_trade === undefined) data.accept_trade = false
 
       const response = await api.post('/products', data)
 
       await saveImageFiles(data.name, response.data.id)
 
+      setIsSubmitSuccessful(true)
       navigation.navigate('preview', { productId: response.data.id })
     } catch (error) {
+      setIsSubmitSuccessful(false)
+
       const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
@@ -188,8 +190,8 @@ export function AddEditForm() {
         bgColor: 'red.500'
       })
     } finally {
-      setIsSubmitSuccessful(false)
       setIsLoading(false)
+      setIsSubmitSuccessful(false)
     }
   }
 
@@ -296,6 +298,7 @@ export function AddEditForm() {
               onChangeValue={onChange}
               delimiter="."
               separator=","
+              precision={2}
               renderTextInput={textInputProps => (
                 <Input
                   placeholder="Valor do produto"

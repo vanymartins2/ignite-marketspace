@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   FlatList,
   HStack,
@@ -22,21 +22,20 @@ import { AntDesign, Feather } from '@expo/vector-icons'
 
 import userDefaultPhoto from '@assets/userDefault.png'
 
-import { Input } from '@components/Input'
-import { Button } from '@components/Button'
-import { AdCard } from '@components/AdCard'
-import { Filter } from '@components/Filter'
 import { UserPhoto } from '@components/UserPhoto'
+import { Filter } from '@components/Filter'
+import { AdCard } from '@components/AdCard'
+import { Button } from '@components/Button'
+import { Input } from '@components/Input'
+import { ProductDetails } from '@dtos/productResponseDTO'
 
 export function Home() {
-  const [ads, setAds] = useState(['Bicicleta', 'Sofá', 'Tênis', 'Roupa'])
-
   const { isOpen, onOpen, onClose } = useDisclose()
   const navigation = useNavigation<AppStackNavigationRoutesProps>()
   const tabNavigation = useNavigation<AppTabsNavigationRoutesProps>()
 
   const { user } = useAuth()
-  const { products } = useProduct()
+  const { products, loadProductFromStorage } = useProduct()
 
   const nameWithoutSurname = user.name.split(' ')[0]
 
@@ -48,9 +47,13 @@ export function Home() {
     tabNavigation.navigate('my-ads')
   }
 
-  function handleOpenDetails() {
-    navigation.navigate('details')
+  function handleOpenDetails(id: string) {
+    navigation.navigate('details', { id })
   }
+
+  useEffect(() => {
+    loadProductFromStorage()
+  }, [])
 
   return (
     <VStack flex={1} py={12} px={8}>
@@ -105,7 +108,7 @@ export function Home() {
 
             <VStack ml={4} flex={1}>
               <Text fontSize="lg" fontFamily="heading" color="gray.200">
-                4
+                {products.filter(product => product.is_active).length}
               </Text>
               <Text fontSize="xs" fontFamily="body" color="gray.200">
                 anúncios ativos
@@ -156,9 +159,11 @@ export function Home() {
         </VStack>
 
         <FlatList
-          data={ads}
-          keyExtractor={item => item}
-          renderItem={() => <AdCard onPress={handleOpenDetails} />}
+          data={products}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <AdCard item={item} onPress={() => handleOpenDetails(item.id)} />
+          )}
           numColumns={2}
           columnWrapperStyle={{ flexShrink: 1 }}
           _contentContainerStyle={{

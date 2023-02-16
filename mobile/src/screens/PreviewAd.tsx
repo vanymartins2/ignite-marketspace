@@ -51,7 +51,7 @@ export function PreviewAd() {
     {} as ProductDetails
   )
 
-  const { authToken } = useAuth()
+  const { refreshedToken, authToken } = useAuth()
   const { saveProductInStorage } = useProduct()
 
   const route = useRoute()
@@ -65,7 +65,7 @@ export function PreviewAd() {
     try {
       await saveProductInStorage(previewInfo)
 
-      navigation.navigate('my-ad-details', { productId, product: previewInfo })
+      navigation.navigate('my-ad-details', { productId })
     } catch (error) {
       console.log(error)
       toast.show({
@@ -102,7 +102,7 @@ export function PreviewAd() {
   useFocusEffect(
     useCallback(() => {
       fetchAdDetails()
-    }, [authToken])
+    }, [refreshedToken])
   )
 
   return (

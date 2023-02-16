@@ -16,6 +16,7 @@ export async function storageProductGet() {
   const storage = await AsyncStorage.getItem(PRODUCT_STORAGE)
   const products: ProductDetails[] = storage ? JSON.parse(storage) : []
 
+  // await AsyncStorage.removeItem(PRODUCT_STORAGE)
   return products
 }
 

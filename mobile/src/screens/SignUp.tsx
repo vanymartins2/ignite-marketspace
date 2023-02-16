@@ -25,6 +25,7 @@ import * as yup from 'yup'
 import { useAuth } from '@hooks/useAuth'
 
 import { api } from '@services/api'
+import { AppError } from '@utils/AppError'
 
 import LogoSvg from '@assets/logo.svg'
 import userDefaultPhoto from '@assets/userDefault.png'
@@ -32,7 +33,6 @@ import userDefaultPhoto from '@assets/userDefault.png'
 import { Input } from '@components/Input'
 import { Button } from '@components/Button'
 import { UserPhoto } from '@components/UserPhoto'
-import { AppError } from '@utils/AppError'
 
 type FormDataProps = {
   name: string

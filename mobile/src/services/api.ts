@@ -26,7 +26,7 @@ type APIInstanceProps = AxiosInstance & {
 }
 
 const api = axios.create({
-  baseURL: 'http://192.168.2.13:3333'
+  baseURL: 'http://192.168.15.101:3333'
 }) as APIInstanceProps
 
 let isRefreshing = false

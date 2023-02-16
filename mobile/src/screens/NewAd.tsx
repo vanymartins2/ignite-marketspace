@@ -7,15 +7,6 @@ import { Header } from '@components/Header'
 import { AddEditForm } from '@components/AddEditForm'
 
 export function NewAd() {
-  const defaultValues = {
-    name: '',
-    description: '',
-    is_new: false,
-    price: 0,
-    accept_trade: false,
-    payment_methods: []
-  }
-
   const navigation = useNavigation<AppTabsNavigationRoutesProps>()
 
   function handleGoBack() {
