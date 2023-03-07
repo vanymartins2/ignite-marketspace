@@ -5,7 +5,8 @@ import {
   IPressableProps,
   Pressable,
   Text,
-  VStack
+  VStack,
+  useTheme
 } from 'native-base'
 
 import { ProductDetails } from '@dtos/productResponseDTO'
@@ -19,9 +20,16 @@ import { api } from '@services/api'
 type Props = IPressableProps & {
   item: ProductDetails
   hasUserPhoto?: boolean
+  is_active?: boolean
 }
 
-export function AdCard({ item, hasUserPhoto = true, ...rest }: Props) {
+export function AdCard({
+  item,
+  hasUserPhoto = true,
+  is_active = true,
+  ...rest
+}: Props) {
+  const { colors } = useTheme()
   return (
     <Pressable {...rest}>
       <VStack mr={5} mt={6}>
@@ -35,7 +43,24 @@ export function AdCard({ item, hasUserPhoto = true, ...rest }: Props) {
             alt="Imagem do anúncio"
             resizeMode="contain"
             borderRadius="md"
+            opacity={!is_active ? 0.45 : 1}
+            bgColor={!is_active ? 'gray.100' : undefined}
           />
+
+          {!is_active && (
+            <Text
+              color="gray.700"
+              fontSize="xs"
+              fontFamily="heading"
+              textTransform="uppercase"
+              position="absolute"
+              bottom={0}
+              px={2}
+              py={2}
+            >
+              Anúncio desativado
+            </Text>
+          )}
 
           <HStack position="absolute" px={1} py={1}>
             <Box flex={1}>
@@ -61,6 +86,7 @@ export function AdCard({ item, hasUserPhoto = true, ...rest }: Props) {
               px={4}
               py={1}
               borderRadius="2xl"
+              opacity={!is_active ? 0.45 : 1}
             >
               <Text
                 fontSize="xs"
@@ -74,18 +100,33 @@ export function AdCard({ item, hasUserPhoto = true, ...rest }: Props) {
           </HStack>
         </Box>
 
-        <Text fontSize="sm" fontFamily="body" color="gray.200">
-          {item?.name}
-        </Text>
+        <Box opacity={!is_active ? 0.45 : 1}>
+          <Text
+            fontSize="sm"
+            fontFamily="body"
+            color={is_active ? 'gray.200' : 'gray.400'}
+          >
+            {item?.name}
+          </Text>
 
-        <HStack alignItems="center">
-          <Text fontSize="xs" fontFamily="heading" color="gray.100" mr={1}>
-            R$
-          </Text>
-          <Text fontSize="md" fontFamily="heading" color="gray.100">
-            {(item?.price / 100).toFixed(2).replace('.', ',')}
-          </Text>
-        </HStack>
+          <HStack alignItems="center">
+            <Text
+              fontSize="xs"
+              fontFamily="heading"
+              color={is_active ? 'gray.100' : 'gray.400'}
+              mr={1}
+            >
+              R$
+            </Text>
+            <Text
+              fontSize="md"
+              fontFamily="heading"
+              color={is_active ? 'gray.100' : 'gray.400'}
+            >
+              {(item?.price / 100).toFixed(2).replace('.', ',')}
+            </Text>
+          </HStack>
+        </Box>
       </VStack>
     </Pressable>
   )

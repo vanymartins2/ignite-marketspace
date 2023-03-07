@@ -8,8 +8,7 @@ import {
   Switch,
   Text,
   VStack,
-  Checkbox as NativeBaseCheckbox,
-  FlatList
+  Checkbox as NativeBaseCheckbox
 } from 'native-base'
 
 import { AntDesign } from '@expo/vector-icons'
@@ -17,6 +16,7 @@ import { AntDesign } from '@expo/vector-icons'
 import { Tag } from '@components/Tag'
 import { Button } from '@components/Button'
 import { Checkbox } from '@components/Checkbox'
+import { useProduct } from '@hooks/useProduct'
 
 type Props = {
   isOpen: boolean
@@ -24,17 +24,32 @@ type Props = {
 }
 
 export function Filter({ isOpen, onClose }: Props) {
-  const [optionSelected, setOptionSelected] = useState('')
-  const [paymentMethods, setPaymentMethods] = useState([
-    'boleto',
-    'pix',
-    'dinheiro',
-    'cartão de crédito',
-    'depósito bancário'
-  ])
+  const [productCondition, setProductCondition] = useState('')
+  const [trade, setTrade] = useState(false)
+  const [paymentMethods, setPaymentMethods] = useState([])
+
+  const { addFilterOptions, removeFilterOptions } = useProduct()
 
   function handleSelected(value: string) {
-    setOptionSelected(value)
+    setProductCondition(value)
+  }
+
+  function handleApplyFilter() {
+    const data = {
+      is_new: productCondition === 'usado' ? false : true,
+      accept_trade: trade,
+      payment_methods: paymentMethods
+    }
+
+    addFilterOptions(data)
+  }
+
+  function handleResetFilter() {
+    setProductCondition('')
+    setTrade(false)
+    setPaymentMethods([])
+
+    removeFilterOptions()
   }
 
   return (
@@ -59,13 +74,13 @@ export function Filter({ isOpen, onClose }: Props) {
             <HStack>
               <Tag
                 value="novo"
-                isActive={optionSelected === 'novo' ? true : false}
+                isActive={productCondition === 'novo' ? true : false}
                 onPress={() => handleSelected('novo')}
                 mr={2}
               />
               <Tag
                 value="usado"
-                isActive={optionSelected === 'usado' ? true : false}
+                isActive={productCondition === 'usado' ? true : false}
                 onPress={() => handleSelected('usado')}
               />
             </HStack>
@@ -79,19 +94,40 @@ export function Filter({ isOpen, onClose }: Props) {
               size="lg"
               onTrackColor="blue.500"
               offTrackColor="gray.500"
+              isChecked={trade}
+              onChange={() => setTrade(!trade)}
             />
           </VStack>
 
           <Text color="gray.200" fontSize="sm" fontFamily="heading" mb={2}>
             Meios de pagamento aceitos
           </Text>
-          {paymentMethods.map(item => (
-            <Checkbox key={item} value={item} label={item} />
-          ))}
+
+          <NativeBaseCheckbox.Group
+            value={paymentMethods}
+            onChange={values => setPaymentMethods(values || [])}
+          >
+            <Checkbox value="pix" label="Pix" />
+            <Checkbox value="card" label="Cartão de crédito" />
+            <Checkbox value="boleto" label="Boleto" />
+            <Checkbox value="cash" label="Dinheiro" />
+            <Checkbox value="deposit" label="Depósito bancário" />
+          </NativeBaseCheckbox.Group>
 
           <HStack mt="auto">
-            <Button title="Resetar filtros" flex={1} variant="gray" mr={3} />
-            <Button title="Aplicar filtros" flex={1} variant="black" />
+            <Button
+              title="Resetar filtros"
+              flex={1}
+              variant="gray"
+              mr={3}
+              onPress={handleResetFilter}
+            />
+            <Button
+              title="Aplicar filtros"
+              flex={1}
+              variant="black"
+              onPress={handleApplyFilter}
+            />
           </HStack>
         </Box>
       </Actionsheet.Content>

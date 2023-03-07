@@ -32,6 +32,17 @@ export async function storageProductRemove(id: string) {
   await AsyncStorage.setItem(PRODUCT_STORAGE, JSON.stringify(filteredProducts))
 }
 
+export async function storageProductUpdate(id: string, is_active: boolean) {
+  const storage = await storageProductGet()
+  const index = storage.findIndex(obj => obj.id === id)
+
+  if (index !== -1) {
+    storage[index] = { ...storage[index], is_active }
+  }
+
+  await AsyncStorage.setItem(PRODUCT_STORAGE, JSON.stringify(storage))
+}
+
 export async function storageSaveImages(images: ProductImageDTO[]) {
   const storedImages = await storageImagesGet()
   const newImages = [...storedImages, ...images]

@@ -7,21 +7,21 @@ import {
   useFocusEffect
 } from '@react-navigation/native'
 import { AppTabsNavigationRoutesProps } from '@routes/appTabs.routes'
-import { ProductDetails } from '@dtos/productResponseDTO'
-
-import { useProduct } from '@hooks/useProduct'
-import { useAuth } from '@hooks/useAuth'
-
-import { AppError } from '@utils/AppError'
-import { api } from '@services/api'
 
 import { Feather } from '@expo/vector-icons'
 
-import { AdDetails } from '@components/AdDetails'
-import { RNSwiper } from '@components/RNSwiper'
-import { Loading } from '@components/Loading'
+import { useAuth } from '@hooks/useAuth'
+import { useProduct } from '@hooks/useProduct'
+
+import { api } from '@services/api'
+import { AppError } from '@utils/AppError'
+import { ProductDetails } from '@dtos/productResponseDTO'
+
 import { Header } from '@components/Header'
 import { Button } from '@components/Button'
+import { Loading } from '@components/Loading'
+import { RNSwiper } from '@components/RNSwiper'
+import { AdDetails } from '@components/AdDetails'
 
 type RouteParams = {
   productId: string
@@ -39,8 +39,7 @@ export function MyAdDetails() {
   const { productId } = route.params as RouteParams
 
   const { authToken } = useAuth()
-  const { products, saveProductInStorage, removeProductFromStorage } =
-    useProduct()
+  const { removeProductFromStorage, editProductInStorage } = useProduct()
 
   const toast = useToast()
 
@@ -74,19 +73,15 @@ export function MyAdDetails() {
     setLoading(true)
     try {
       await api.patch(`products/${productId}`, { is_active: false })
+
       currentProduct.is_active = false
 
-      const foundProduct = products.find(product => product.id === productId)
-
-      if (foundProduct) {
-        const updatedProduct = { ...foundProduct, is_active: false }
-        saveProductInStorage(updatedProduct)
-      }
+      editProductInStorage(productId, false)
 
       toast.show({
         title: 'Anúncio desativado!',
         placement: 'top',
-        bgColor: 'green.500'
+        bgColor: 'blue.500'
       })
     } catch (error) {
       const isAppError = error instanceof AppError
@@ -110,17 +105,12 @@ export function MyAdDetails() {
       await api.patch(`products/${productId}`, { is_active: true })
       currentProduct.is_active = true
 
-      const foundProduct = products.find(product => product.id === productId)
-
-      if (foundProduct) {
-        const updatedProduct = { ...foundProduct, is_active: true }
-        saveProductInStorage(updatedProduct)
-      }
+      editProductInStorage(productId, true)
 
       toast.show({
         title: 'Anúncio reativado!',
         placement: 'top',
-        bgColor: 'green.500'
+        bgColor: 'blue.500'
       })
     } catch (error) {
       const isAppError = error instanceof AppError
@@ -147,7 +137,7 @@ export function MyAdDetails() {
       toast.show({
         title: 'Anúncio removido com sucesso!',
         placement: 'top',
-        bgColor: 'green.500'
+        bgColor: 'blue.500'
       })
 
       navigation.navigate('my-ads')

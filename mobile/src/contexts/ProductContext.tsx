@@ -1,4 +1,11 @@
-import { createContext, ReactNode, useEffect, useState } from 'react'
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState
+} from 'react'
+import { useFocusEffect } from '@react-navigation/native'
 
 import { ProductImageDTO } from '@dtos/productImageDTO'
 import { ProductDetails } from '@dtos/productResponseDTO'
@@ -8,8 +15,12 @@ import {
   storageProductRemove,
   storageProductSave,
   storageImagesRemove,
-  storageSaveImages
+  storageSaveImages,
+  storageProductUpdate
 } from '@storage/storageProduct'
+import { FilterDTO } from '@dtos/FilterDTO'
+import { api } from '@services/api'
+import { useAuth } from '@hooks/useAuth'
 
 type ProductContextProviderProps = {
   children: ReactNode
@@ -17,10 +28,14 @@ type ProductContextProviderProps = {
 
 export type ProductContextDataProps = {
   products: ProductDetails[]
+  addFilterOptions: (data: FilterDTO) => void
+  removeFilterOptions: () => void
+  appliedFilterOptions: FilterDTO
   loadProductFromStorage: () => void
+  isLoadingDataFromStorage: boolean
   saveImagesInStorage: (images: ProductImageDTO[]) => Promise<void>
   removeProductFromStorage: (id: string) => Promise<void>
-  editProductInStorage: (id: string, status: boolean) => void
+  editProductInStorage: (id: string, is_active: boolean) => void
   saveProductInStorage: (productData: ProductDetails) => Promise<void>
   removeImagesFromStorage: (ids: string[]) => Promise<void>
 }
@@ -35,9 +50,13 @@ export function ProductContextProvider({
   const [products, setProducts] = useState<ProductDetails[]>(
     [] as ProductDetails[]
   )
+  const [appliedFilterOptions, setAppliedFilterOptions] = useState<FilterDTO>(
+    {} as FilterDTO
+  )
   const [images, setImages] = useState<ProductImageDTO[]>(
     [] as ProductImageDTO[]
   )
+  const [isLoadingDataFromStorage, setIsLoadingDataFromStorage] = useState(true)
 
   async function saveProductInStorage(productData: ProductDetails) {
     try {
@@ -55,17 +74,20 @@ export function ProductContextProvider({
     }
   }
 
-  function editProductInStorage(id: string, status: boolean) {
-    const foundProduct = products.find(product => product.id === id)
-
-    if (foundProduct) {
-      const updatedProduct = {
-        ...foundProduct,
-        is_active: status
-      }
-
-      setProducts(prevState => [...prevState, updatedProduct])
+  async function editProductInStorage(id: string, is_active: boolean) {
+    try {
+      await storageProductUpdate(id, is_active)
+    } catch (error) {
+      throw error
     }
+  }
+
+  function addFilterOptions(data: FilterDTO) {
+    setAppliedFilterOptions(data)
+  }
+
+  function removeFilterOptions() {
+    setAppliedFilterOptions({} as FilterDTO)
   }
 
   async function saveImagesInStorage(images: ProductImageDTO[]) {
@@ -87,10 +109,13 @@ export function ProductContextProvider({
 
   async function loadProductFromStorage() {
     try {
-      const products = await storageProductGet()
-      setProducts(products)
+      setIsLoadingDataFromStorage(true)
+      const storage = await storageProductGet()
+      setProducts(storage)
     } catch (error) {
       throw error
+    } finally {
+      setIsLoadingDataFromStorage(false)
     }
   }
 
@@ -102,7 +127,11 @@ export function ProductContextProvider({
     <ProductContext.Provider
       value={{
         products,
+        addFilterOptions,
+        removeFilterOptions,
+        appliedFilterOptions,
         loadProductFromStorage,
+        isLoadingDataFromStorage,
         saveImagesInStorage,
         removeImagesFromStorage,
         saveProductInStorage,

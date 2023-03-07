@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback } from 'react'
 import {
   FlatList,
   HStack,
@@ -9,8 +9,10 @@ import {
   VStack
 } from 'native-base'
 
-import { useNavigation } from '@react-navigation/native'
+import { AntDesign, Feather } from '@expo/vector-icons'
+
 import { AppTabsNavigationRoutesProps } from '@routes/appTabs.routes'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { AppStackNavigationRoutesProps } from '@routes/appStack.routes'
 
 import { useAuth } from '@hooks/useAuth'
@@ -18,16 +20,14 @@ import { useProduct } from '@hooks/useProduct'
 
 import { api } from '@services/api'
 
-import { AntDesign, Feather } from '@expo/vector-icons'
-
 import userDefaultPhoto from '@assets/userDefault.png'
 
-import { UserPhoto } from '@components/UserPhoto'
-import { Filter } from '@components/Filter'
-import { AdCard } from '@components/AdCard'
-import { Button } from '@components/Button'
 import { Input } from '@components/Input'
-import { ProductDetails } from '@dtos/productResponseDTO'
+import { Filter } from '@components/Filter'
+import { Button } from '@components/Button'
+import { AdCard } from '@components/AdCard'
+import { Loading } from '@components/Loading'
+import { UserPhoto } from '@components/UserPhoto'
 
 export function Home() {
   const { isOpen, onOpen, onClose } = useDisclose()
@@ -35,9 +35,13 @@ export function Home() {
   const tabNavigation = useNavigation<AppTabsNavigationRoutesProps>()
 
   const { user } = useAuth()
-  const { products, loadProductFromStorage } = useProduct()
+  const { products, loadProductFromStorage, isLoadingDataFromStorage } =
+    useProduct()
 
   const nameWithoutSurname = user.name.split(' ')[0]
+  const quantityOfActiveAdsFromLoggedUser = products.filter(
+    product => product.user_id === user.id
+  ).length
 
   function handleOpenNewAd() {
     navigation.navigate('new')
@@ -48,12 +52,22 @@ export function Home() {
   }
 
   function handleOpenDetails(id: string) {
-    navigation.navigate('details', { id })
+    const selectedProduct = products.find(product => product.id === id)
+
+    if (selectedProduct?.user_id === user.id) {
+      navigation.navigate('my-ad-details', { productId: id })
+    } else {
+      navigation.navigate('details', { id })
+    }
   }
 
-  useEffect(() => {
-    loadProductFromStorage()
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      loadProductFromStorage()
+    }, [])
+  )
+
+  console.log(products)
 
   return (
     <VStack flex={1} py={12} px={8}>
@@ -108,7 +122,7 @@ export function Home() {
 
             <VStack ml={4} flex={1}>
               <Text fontSize="lg" fontFamily="heading" color="gray.200">
-                {products.filter(product => product.is_active).length}
+                {quantityOfActiveAdsFromLoggedUser}
               </Text>
               <Text fontSize="xs" fontFamily="body" color="gray.200">
                 anúncios ativos
@@ -158,19 +172,23 @@ export function Home() {
           <Filter isOpen={isOpen} onClose={onClose} />
         </VStack>
 
-        <FlatList
-          data={products}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <AdCard item={item} onPress={() => handleOpenDetails(item.id)} />
-          )}
-          numColumns={2}
-          columnWrapperStyle={{ flexShrink: 1 }}
-          _contentContainerStyle={{
-            paddingBottom: 270
-          }}
-          showsVerticalScrollIndicator={false}
-        />
+        {!isLoadingDataFromStorage ? (
+          <FlatList
+            data={products}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <AdCard item={item} onPress={() => handleOpenDetails(item.id)} />
+            )}
+            numColumns={2}
+            columnWrapperStyle={{ flexShrink: 1 }}
+            _contentContainerStyle={{
+              paddingBottom: 270
+            }}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <Loading />
+        )}
       </VStack>
     </VStack>
   )

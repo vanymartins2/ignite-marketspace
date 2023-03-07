@@ -12,14 +12,15 @@ import {
 } from 'native-base'
 
 import { useNavigation, useFocusEffect } from '@react-navigation/native'
+import { AppStackNavigationRoutesProps } from '@routes/appStack.routes'
+
 import { AntDesign, Feather } from '@expo/vector-icons'
 
 import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
-import { useAuth } from '@hooks/useAuth'
-
 import { ProductDetails } from '@dtos/productResponseDTO'
-import { AppStackNavigationRoutesProps } from '@routes/appStack.routes'
+
+import { useAuth } from '@hooks/useAuth'
 
 import { AdCard } from '@components/AdCard'
 import { Loading } from '@components/Loading'
@@ -124,8 +125,9 @@ export function Ads() {
           renderItem={({ item }) => (
             <AdCard
               item={item}
-              onPress={() => handleOpenDetails(item.id)}
               hasUserPhoto={false}
+              is_active={item.is_active}
+              onPress={() => handleOpenDetails(item.id)}
             />
           )}
           numColumns={2}
