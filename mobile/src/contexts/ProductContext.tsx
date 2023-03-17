@@ -22,6 +22,8 @@ import {
 import { FilterDTO } from '@dtos/FilterDTO'
 import { api } from '@services/api'
 import { useAuth } from '@hooks/useAuth'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { PRODUCT_IMAGES_STORAGE } from '@storage/storageConfig'
 
 type ProductContextProviderProps = {
   children: ReactNode
@@ -135,6 +137,7 @@ export function ProductContextProvider({
       const response = await api.get('/users/products')
 
       setUserProducts(response.data)
+      await AsyncStorage.removeItem(PRODUCT_IMAGES_STORAGE)
     } catch (error) {
       throw error
     }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Platform } from 'react-native'
 import {
   Box,
@@ -72,10 +72,10 @@ export function AddEditForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [photoIsLoading, setPhotoIsLoading] = useState(false)
   const [photos, setPhotos] = useState([] as ImagePicker.ImagePickerAsset[])
-  const [payments, setPayments] = useState<string[]>([])
   const [currentAd, setCurrentAd] = useState<ProductDetails>(
     {} as ProductDetails
   )
+  const [currentPayments, setCurrentPayments] = useState<string[]>([])
 
   const { refreshedToken } = useAuth()
   const { saveImagesInStorage } = useProduct()
@@ -101,7 +101,7 @@ export function AddEditForm() {
     is_new: currentAd.is_new,
     price: currentAd.price / 100,
     accept_trade: currentAd.accept_trade,
-    payment_methods: payments
+    payment_methods: currentPayments
   }
 
   function handleCancel() {
@@ -275,7 +275,7 @@ export function AddEditForm() {
       return
     } else {
       const paymentsArray = currentAd.payment_methods.map(item => item.key)
-      setPayments(paymentsArray)
+      setCurrentPayments(paymentsArray)
 
       reset(defaultValues)
     }
@@ -444,10 +444,10 @@ export function AddEditForm() {
           <Controller
             control={control}
             name="payment_methods"
-            render={({ field: { value, onChange } }) => (
+            render={({ field: { onChange } }) => (
               <NativeBaseCheckbox.Group
-                onChange={value => onChange(value)}
-                value={currentAd.id ? payments : value}
+                value={currentAd.id ? currentPayments : []}
+                onChange={onChange}
               >
                 <Checkbox value="pix" label="Pix" />
                 <Checkbox value="card" label="Cartão de crédito" />
