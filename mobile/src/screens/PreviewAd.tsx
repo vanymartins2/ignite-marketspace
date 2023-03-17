@@ -32,7 +32,7 @@ export function PreviewAd() {
     {} as ProductDetails
   )
 
-  const { refreshedToken, authToken } = useAuth()
+  const { refreshedToken } = useAuth()
   const { saveProductInStorage } = useProduct()
 
   const route = useRoute()
@@ -40,6 +40,10 @@ export function PreviewAd() {
   const { productId } = route.params as RouteParams
 
   const navigation = useNavigation<AppStackNavigationRoutesProps>()
+
+  function handleGoBackAndEdit() {
+    navigation.navigate('new', { id: productId })
+  }
 
   async function handlePublishAd() {
     setIsLoading(true)
@@ -119,6 +123,7 @@ export function PreviewAd() {
           hasIcon
           iconType={AntDesign}
           iconName="arrowleft"
+          onPress={handleGoBackAndEdit}
         />
         <Button
           flex={1}

@@ -1,20 +1,30 @@
 import { Pressable, Image, Icon, IPressableProps } from 'native-base'
 
 import { AntDesign } from '@expo/vector-icons'
+import { api } from '@services/api'
 
 type Props = IPressableProps & {
   uri?: string
+  path?: string
   hasImage?: boolean
   onRemove?: () => void
 }
 
-export function PickerImg({ uri, hasImage = false, onRemove, ...rest }: Props) {
+export function PickerImg({
+  uri,
+  path,
+  hasImage = false,
+  onRemove,
+  ...rest
+}: Props) {
   return (
     <>
       {hasImage ? (
         <Pressable mr={2} borderRadius="md" overflow="hidden" {...rest}>
           <Image
-            source={{ uri: uri }}
+            source={{
+              uri: path ? `${api.defaults.baseURL}/images/${path}` : uri
+            }}
             w={24}
             h={24}
             alt="Foto selecionada do produto"

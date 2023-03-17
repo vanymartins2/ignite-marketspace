@@ -16,44 +16,62 @@ import { AppStackNavigationRoutesProps } from '@routes/appStack.routes'
 
 import { AntDesign, Feather } from '@expo/vector-icons'
 
-import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
 import { ProductDetails } from '@dtos/productResponseDTO'
 
 import { useAuth } from '@hooks/useAuth'
+import { useProduct } from '@hooks/useProduct'
 
 import { AdCard } from '@components/AdCard'
 import { Loading } from '@components/Loading'
 
 export function Ads() {
   const [isLoading, setIsLoading] = useState(false)
-  const [ads, setAds] = useState<ProductDetails[]>([] as ProductDetails[])
+  const [selectedFilter, setSelectedFilter] = useState('all')
+  const [filteredAds, setFilteredAds] = useState<ProductDetails[]>([])
 
   const { refreshedToken } = useAuth()
+  const { loadProductsFromUser, userProducts } = useProduct()
 
-  const navigation = useNavigation<AppStackNavigationRoutesProps>()
   const toast = useToast()
+  const navigation = useNavigation<AppStackNavigationRoutesProps>()
 
   function handleNewAd() {
-    navigation.navigate('new')
+    navigation.navigate('new', { id: undefined })
   }
 
   function handleOpenDetails(id: string) {
     navigation.navigate('my-ad-details', { productId: id })
   }
 
-  async function fetchAdsFromLoggedUser() {
+  function handleFilterAds(value: string) {
+    setSelectedFilter(value)
+
+    switch (value) {
+      case 'all':
+        const all = userProducts
+        setFilteredAds(all)
+        break
+      case 'active':
+        const activeAds = userProducts.filter(ad => ad.is_active)
+        setFilteredAds(activeAds)
+        break
+      case 'inactive':
+        const inactiveAds = userProducts.filter(ad => ad.is_active === false)
+        setFilteredAds(inactiveAds)
+        break
+    }
+  }
+
+  function fetchAdsFromLoggedUser() {
     setIsLoading(true)
-
     try {
-      const response = await api.get('users/products')
-
-      setAds(response.data)
+      loadProductsFromUser()
     } catch (error) {
       const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : 'Não foi possível carregar a pré-visualização.'
+        : 'Não foi possível carregar os anúncios do usuário.'
 
       toast.show({
         title,
@@ -85,7 +103,7 @@ export function Ads() {
 
       <HStack alignItems="center" justifyContent="space-between" mb={5}>
         <Text fontSize="sm" fontFamily="body" color="gray.200">
-          {ads.length} anúncios
+          {userProducts.length} anúncios
         </Text>
 
         <Select
@@ -94,13 +112,14 @@ export function Ads() {
           color="gray.100"
           fontSize="sm"
           fontFamily="body"
-          selectedValue="all"
+          selectedValue={selectedFilter}
           dropdownIcon={
             <Icon as={Feather} name="chevron-down" size={4} mr={2} />
           }
           dropdownOpenIcon={
             <Icon as={Feather} name="chevron-up" size={4} mr={2} />
           }
+          onValueChange={value => handleFilterAds(value)}
         >
           <Select.Item label="Todos" value="all" />
           <Select.Item label="Ativos" value="active" />
@@ -108,7 +127,7 @@ export function Ads() {
         </Select>
       </HStack>
 
-      {ads.length === 0 && (
+      {userProducts.length === 0 && (
         <Box flex={1} justifyContent="center">
           <Text textAlign="center" color="gray.400">
             Você ainda não possui anúncios criados.
@@ -120,7 +139,7 @@ export function Ads() {
         <Loading />
       ) : (
         <FlatList
-          data={ads}
+          data={selectedFilter !== 'all' ? filteredAds : userProducts}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
             <AdCard

@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   FlatList,
   HStack,
@@ -6,6 +6,7 @@ import {
   Pressable,
   Text,
   useDisclose,
+  useToast,
   VStack
 } from 'native-base'
 
@@ -19,6 +20,8 @@ import { useAuth } from '@hooks/useAuth'
 import { useProduct } from '@hooks/useProduct'
 
 import { api } from '@services/api'
+import { AppError } from '@utils/AppError'
+import { ProductDetails } from '@dtos/productResponseDTO'
 
 import userDefaultPhoto from '@assets/userDefault.png'
 
@@ -30,21 +33,24 @@ import { Loading } from '@components/Loading'
 import { UserPhoto } from '@components/UserPhoto'
 
 export function Home() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [query, setQuery] = useState('')
+  const [products, setProducts] = useState<ProductDetails[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<ProductDetails[]>([])
+
+  const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclose()
   const navigation = useNavigation<AppStackNavigationRoutesProps>()
   const tabNavigation = useNavigation<AppTabsNavigationRoutesProps>()
 
-  const { user } = useAuth()
-  const { products, loadProductFromStorage, isLoadingDataFromStorage } =
+  const { user, refreshedToken } = useAuth()
+  const { appliedFilterOptions, activeAdsQuantity, loadProductsFromUser } =
     useProduct()
 
   const nameWithoutSurname = user.name.split(' ')[0]
-  const quantityOfActiveAdsFromLoggedUser = products.filter(
-    product => product.user_id === user.id
-  ).length
 
   function handleOpenNewAd() {
-    navigation.navigate('new')
+    navigation.navigate('new', { id: undefined })
   }
 
   function handleOpenMyAds() {
@@ -61,13 +67,61 @@ export function Home() {
     }
   }
 
+  async function fetchAllProducts() {
+    setIsLoading(true)
+    try {
+      const response = await api.get('/products')
+
+      setProducts(response.data)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível carregar os produtos.'
+
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  async function fetchFilteredProducts() {
+    setIsLoading(true)
+    try {
+      const response = await api.get('/products', {
+        params: { ...appliedFilterOptions, query }
+      })
+
+      setFilteredProducts(response.data)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível filtrar os produtos.'
+
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchAllProducts()
+  }, [])
+
   useFocusEffect(
     useCallback(() => {
-      loadProductFromStorage()
-    }, [])
+      loadProductsFromUser()
+    }, [refreshedToken])
   )
-
-  console.log(products)
 
   return (
     <VStack flex={1} py={12} px={8}>
@@ -122,7 +176,7 @@ export function Home() {
 
             <VStack ml={4} flex={1}>
               <Text fontSize="lg" fontFamily="heading" color="gray.200">
-                {quantityOfActiveAdsFromLoggedUser}
+                {activeAdsQuantity}
               </Text>
               <Text fontSize="xs" fontFamily="body" color="gray.200">
                 anúncios ativos
@@ -149,10 +203,16 @@ export function Home() {
           </Text>
 
           <Input
+            value={query}
+            onChangeText={setQuery}
             placeholder="Buscar anúncio"
             InputRightElement={
               <>
-                <Pressable borderRightWidth={1} borderRightColor="gray.400">
+                <Pressable
+                  borderRightWidth={1}
+                  borderRightColor="gray.400"
+                  onPress={fetchFilteredProducts}
+                >
                   <Icon
                     as={Feather}
                     name="search"
@@ -172,9 +232,13 @@ export function Home() {
           <Filter isOpen={isOpen} onClose={onClose} />
         </VStack>
 
-        {!isLoadingDataFromStorage ? (
+        {!isLoading ? (
           <FlatList
-            data={products}
+            data={
+              Object.keys(appliedFilterOptions).length > 0 && isLoading
+                ? filteredProducts
+                : products
+            }
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
               <AdCard item={item} onPress={() => handleOpenDetails(item.id)} />
@@ -185,9 +249,20 @@ export function Home() {
               paddingBottom: 270
             }}
             showsVerticalScrollIndicator={false}
+            ListEmptyComponent={() => (
+              <Text
+                fontFamily="body"
+                color="gray.400"
+                fontSize="md"
+                textAlign="center"
+                mt={8}
+              >
+                Nenhum produto foi encontrado.
+              </Text>
+            )}
           />
         ) : (
-          <Loading />
+          <Loading mt={8} />
         )}
       </VStack>
     </VStack>

@@ -50,6 +50,7 @@ export function Button({
           />
         ) : undefined
       }
+      _pressed={{ opacity: 0.5 }}
       {...rest}
     >
       <Text

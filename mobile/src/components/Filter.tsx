@@ -13,10 +13,11 @@ import {
 
 import { AntDesign } from '@expo/vector-icons'
 
+import { useProduct } from '@hooks/useProduct'
+
 import { Tag } from '@components/Tag'
 import { Button } from '@components/Button'
 import { Checkbox } from '@components/Checkbox'
-import { useProduct } from '@hooks/useProduct'
 
 type Props = {
   isOpen: boolean
@@ -28,7 +29,8 @@ export function Filter({ isOpen, onClose }: Props) {
   const [trade, setTrade] = useState(false)
   const [paymentMethods, setPaymentMethods] = useState([])
 
-  const { addFilterOptions, removeFilterOptions } = useProduct()
+  const { addFilterOptions, removeFilterOptions, appliedFilterOptions } =
+    useProduct()
 
   function handleSelected(value: string) {
     setProductCondition(value)
@@ -42,6 +44,8 @@ export function Filter({ isOpen, onClose }: Props) {
     }
 
     addFilterOptions(data)
+
+    onClose()
   }
 
   function handleResetFilter() {

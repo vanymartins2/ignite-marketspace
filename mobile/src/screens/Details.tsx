@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Linking } from 'react-native'
-import { Box, HStack, Text, ScrollView } from 'native-base'
+import { Box, HStack, Text, ScrollView, useToast, Center } from 'native-base'
 import {
   useNavigation,
   useRoute,
@@ -9,12 +9,14 @@ import {
 
 import { FontAwesome } from '@expo/vector-icons'
 
-import { useProduct } from '@hooks/useProduct'
+import { api } from '@services/api'
+import { AppError } from '@utils/AppError'
 
 import { ProductDetails } from '@dtos/productResponseDTO'
 
 import { Header } from '@components/Header'
 import { Button } from '@components/Button'
+import { Loading } from '@components/Loading'
 import { RNSwiper } from '@components/RNSwiper'
 import { AdDetails } from '@components/AdDetails'
 
@@ -23,11 +25,12 @@ type RouteParams = {
 }
 
 export function Details() {
+  const [loading, setLoading] = useState(true)
   const [selectedProduct, setSelectedProduct] = useState<ProductDetails>(
     {} as ProductDetails
   )
 
-  const { products } = useProduct()
+  const toast = useToast()
 
   const route = useRoute()
   const { id } = route.params as RouteParams
@@ -37,14 +40,25 @@ export function Details() {
     navigation.goBack()
   }
 
-  function fetchAdDetails() {
-    const foundAd = products.find(product => id === product.id)
+  async function fetchAdDetails() {
+    setLoading(true)
+    try {
+      const response = await api.get(`/products/${id}`)
+      setSelectedProduct(response.data)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível filtrar os produtos.'
 
-    if (!foundAd) {
-      return
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500'
+      })
+    } finally {
+      setLoading(false)
     }
-
-    setSelectedProduct(foundAd)
   }
 
   useFocusEffect(
@@ -53,6 +67,10 @@ export function Details() {
     }, [id])
   )
 
+  if (loading) {
+    return <Loading />
+  }
+
   return (
     <>
       <Box px={6} pt={12} pb={3}>
@@ -60,9 +78,11 @@ export function Details() {
       </Box>
 
       {!selectedProduct.id ? (
-        <Text flex={1} fontSize="sm" fontFamily="body" color="gray.400">
-          Produto não encontrado
-        </Text>
+        <Center flex={1}>
+          <Text fontSize="sm" fontFamily="body" color="gray.400">
+            Produto não encontrado
+          </Text>
+        </Center>
       ) : (
         <>
           <Box minH={280}>

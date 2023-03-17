@@ -7,6 +7,7 @@ import {
   useFocusEffect
 } from '@react-navigation/native'
 import { AppTabsNavigationRoutesProps } from '@routes/appTabs.routes'
+import { AppStackNavigationRoutesProps } from '@routes/appStack.routes'
 
 import { Feather } from '@expo/vector-icons'
 
@@ -25,7 +26,6 @@ import { AdDetails } from '@components/AdDetails'
 
 type RouteParams = {
   productId: string
-  product: ProductDetails
 }
 
 export function MyAdDetails() {
@@ -35,10 +35,11 @@ export function MyAdDetails() {
   )
 
   const navigation = useNavigation<AppTabsNavigationRoutesProps>()
+  const stackNavigation = useNavigation<AppStackNavigationRoutesProps>()
   const route = useRoute()
   const { productId } = route.params as RouteParams
 
-  const { authToken } = useAuth()
+  const { refreshedToken } = useAuth()
   const { removeProductFromStorage, editProductInStorage } = useProduct()
 
   const toast = useToast()
@@ -47,26 +48,8 @@ export function MyAdDetails() {
     navigation.navigate('my-ads')
   }
 
-  async function fetchAdDetails() {
-    setLoading(true)
-    try {
-      const response = await api.get(`/products/${productId}`)
-
-      setCurrentProduct(response.data)
-    } catch (error) {
-      const isAppError = error instanceof AppError
-      const title = isAppError
-        ? error.message
-        : 'Não foi possível carregar a pré-visualização.'
-
-      toast.show({
-        title,
-        placement: 'top',
-        bgColor: 'red.500'
-      })
-    } finally {
-      setLoading(false)
-    }
+  function handleGoEdit() {
+    stackNavigation.navigate('edit', { id: productId })
   }
 
   async function handleDisableAd() {
@@ -157,10 +140,32 @@ export function MyAdDetails() {
     }
   }
 
+  async function fetchAdDetails() {
+    setLoading(true)
+    try {
+      const response = await api.get(`/products/${productId}`)
+
+      setCurrentProduct(response.data)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível carregar a pré-visualização.'
+
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500'
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useFocusEffect(
     useCallback(() => {
       fetchAdDetails()
-    }, [authToken])
+    }, [refreshedToken])
   )
 
   if (!currentProduct.id) {
@@ -170,7 +175,11 @@ export function MyAdDetails() {
   return (
     <>
       <Box px={6} pt={12} pb={3}>
-        <Header onPressBackButton={handleGoBack} hasIcon />
+        <Header
+          hasIcon
+          onPressBackButton={handleGoBack}
+          onPressEditButton={handleGoEdit}
+        />
       </Box>
       <ScrollView>
         {loading ? (

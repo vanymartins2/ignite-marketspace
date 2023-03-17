@@ -16,11 +16,12 @@ import { useNavigation } from '@react-navigation/native'
 
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
-import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system'
-import { useForm, Controller } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
+import * as ImagePicker from 'expo-image-picker'
+
 import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm, Controller } from 'react-hook-form'
 
 import { useAuth } from '@hooks/useAuth'
 

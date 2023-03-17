@@ -16,7 +16,8 @@ import {
   storageProductSave,
   storageImagesRemove,
   storageSaveImages,
-  storageProductUpdate
+  storageProductUpdate,
+  storageImagesGet
 } from '@storage/storageProduct'
 import { FilterDTO } from '@dtos/FilterDTO'
 import { api } from '@services/api'
@@ -27,11 +28,14 @@ type ProductContextProviderProps = {
 }
 
 export type ProductContextDataProps = {
-  products: ProductDetails[]
+  // products: ProductDetails[]
+  activeAdsQuantity: number
+  userProducts: ProductDetails[]
+  loadProductsFromUser: () => Promise<void>
   addFilterOptions: (data: FilterDTO) => void
   removeFilterOptions: () => void
   appliedFilterOptions: FilterDTO
-  loadProductFromStorage: () => void
+  // loadProductFromStorage: () => void
   isLoadingDataFromStorage: boolean
   saveImagesInStorage: (images: ProductImageDTO[]) => Promise<void>
   removeProductFromStorage: (id: string) => Promise<void>
@@ -47,9 +51,10 @@ export const ProductContext = createContext<ProductContextDataProps>(
 export function ProductContextProvider({
   children
 }: ProductContextProviderProps) {
-  const [products, setProducts] = useState<ProductDetails[]>(
-    [] as ProductDetails[]
-  )
+  // const [products, setProducts] = useState<ProductDetails[]>(
+  //   [] as ProductDetails[]
+  // )
+  const [userProducts, setUserProducts] = useState<ProductDetails[]>([])
   const [appliedFilterOptions, setAppliedFilterOptions] = useState<FilterDTO>(
     {} as FilterDTO
   )
@@ -57,6 +62,10 @@ export function ProductContextProvider({
     [] as ProductImageDTO[]
   )
   const [isLoadingDataFromStorage, setIsLoadingDataFromStorage] = useState(true)
+
+  const activeAdsQuantity = userProducts.filter(
+    product => product.is_active === true
+  ).length
 
   async function saveProductInStorage(productData: ProductDetails) {
     try {
@@ -93,7 +102,9 @@ export function ProductContextProvider({
   async function saveImagesInStorage(images: ProductImageDTO[]) {
     try {
       await storageSaveImages(images)
-      setImages(images)
+
+      const storageImg = await storageImagesGet()
+      setImages(storageImg)
     } catch (error) {
       throw error
     }
@@ -107,30 +118,41 @@ export function ProductContextProvider({
     }
   }
 
-  async function loadProductFromStorage() {
+  // async function loadProductFromStorage() {
+  //   try {
+  //     setIsLoadingDataFromStorage(true)
+  //     const storage = await storageProductGet()
+  //     setProducts(storage)
+  //   } catch (error) {
+  //     throw error
+  //   } finally {
+  //     setIsLoadingDataFromStorage(false)
+  //   }
+  // }
+
+  async function loadProductsFromUser() {
     try {
-      setIsLoadingDataFromStorage(true)
-      const storage = await storageProductGet()
-      setProducts(storage)
+      const response = await api.get('/users/products')
+
+      setUserProducts(response.data)
     } catch (error) {
       throw error
-    } finally {
-      setIsLoadingDataFromStorage(false)
     }
   }
 
-  useEffect(() => {
-    loadProductFromStorage()
-  }, [])
+  console.log(images)
 
   return (
     <ProductContext.Provider
       value={{
-        products,
+        // products,
+        activeAdsQuantity,
+        userProducts,
+        loadProductsFromUser,
         addFilterOptions,
         removeFilterOptions,
         appliedFilterOptions,
-        loadProductFromStorage,
+        // loadProductFromStorage,
         isLoadingDataFromStorage,
         saveImagesInStorage,
         removeImagesFromStorage,

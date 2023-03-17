@@ -29,7 +29,6 @@ export function AdCard({
   is_active = true,
   ...rest
 }: Props) {
-  const { colors } = useTheme()
   return (
     <Pressable {...rest}>
       <VStack mr={5} mt={6}>
