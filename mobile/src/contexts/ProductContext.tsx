@@ -1,11 +1,4 @@
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState
-} from 'react'
-import { useFocusEffect } from '@react-navigation/native'
+import { createContext, ReactNode, useEffect, useState } from 'react'
 
 import { ProductImageDTO } from '@dtos/productImageDTO'
 import { ProductDetails } from '@dtos/productResponseDTO'
@@ -19,25 +12,24 @@ import {
   storageProductUpdate,
   storageImagesGet
 } from '@storage/storageProduct'
+import { PRODUCT_IMAGES_STORAGE } from '@storage/storageConfig'
+
 import { FilterDTO } from '@dtos/FilterDTO'
 import { api } from '@services/api'
 import { useAuth } from '@hooks/useAuth'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { PRODUCT_IMAGES_STORAGE } from '@storage/storageConfig'
 
 type ProductContextProviderProps = {
   children: ReactNode
 }
 
 export type ProductContextDataProps = {
-  // products: ProductDetails[]
-  activeAdsQuantity: number
   userProducts: ProductDetails[]
+  storedImages: ProductImageDTO[]
+  loadImagesFromStorage: () => Promise<void>
   loadProductsFromUser: () => Promise<void>
   addFilterOptions: (data: FilterDTO) => void
   removeFilterOptions: () => void
   appliedFilterOptions: FilterDTO
-  // loadProductFromStorage: () => void
   isLoadingDataFromStorage: boolean
   saveImagesInStorage: (images: ProductImageDTO[]) => Promise<void>
   removeProductFromStorage: (id: string) => Promise<void>
@@ -53,21 +45,14 @@ export const ProductContext = createContext<ProductContextDataProps>(
 export function ProductContextProvider({
   children
 }: ProductContextProviderProps) {
-  // const [products, setProducts] = useState<ProductDetails[]>(
-  //   [] as ProductDetails[]
-  // )
   const [userProducts, setUserProducts] = useState<ProductDetails[]>([])
   const [appliedFilterOptions, setAppliedFilterOptions] = useState<FilterDTO>(
     {} as FilterDTO
   )
-  const [images, setImages] = useState<ProductImageDTO[]>(
+  const [storedImages, setStoredImages] = useState<ProductImageDTO[]>(
     [] as ProductImageDTO[]
   )
   const [isLoadingDataFromStorage, setIsLoadingDataFromStorage] = useState(true)
-
-  const activeAdsQuantity = userProducts.filter(
-    product => product.is_active === true
-  ).length
 
   async function saveProductInStorage(productData: ProductDetails) {
     try {
@@ -104,9 +89,6 @@ export function ProductContextProvider({
   async function saveImagesInStorage(images: ProductImageDTO[]) {
     try {
       await storageSaveImages(images)
-
-      const storageImg = await storageImagesGet()
-      setImages(storageImg)
     } catch (error) {
       throw error
     }
@@ -120,42 +102,41 @@ export function ProductContextProvider({
     }
   }
 
-  // async function loadProductFromStorage() {
-  //   try {
-  //     setIsLoadingDataFromStorage(true)
-  //     const storage = await storageProductGet()
-  //     setProducts(storage)
-  //   } catch (error) {
-  //     throw error
-  //   } finally {
-  //     setIsLoadingDataFromStorage(false)
-  //   }
-  // }
-
   async function loadProductsFromUser() {
+    setIsLoadingDataFromStorage(true)
     try {
       const response = await api.get('/users/products')
 
       setUserProducts(response.data)
-      await AsyncStorage.removeItem(PRODUCT_IMAGES_STORAGE)
     } catch (error) {
       throw error
+    } finally {
+      setIsLoadingDataFromStorage(false)
     }
   }
 
-  console.log(images)
+  async function loadImagesFromStorage() {
+    setIsLoadingDataFromStorage(true)
+    try {
+      const storedImages = await storageImagesGet()
+      setStoredImages(storedImages)
+    } catch (error) {
+      throw error
+    } finally {
+      setIsLoadingDataFromStorage(false)
+    }
+  }
 
   return (
     <ProductContext.Provider
       value={{
-        // products,
-        activeAdsQuantity,
         userProducts,
+        storedImages,
+        loadImagesFromStorage,
         loadProductsFromUser,
         addFilterOptions,
         removeFilterOptions,
         appliedFilterOptions,
-        // loadProductFromStorage,
         isLoadingDataFromStorage,
         saveImagesInStorage,
         removeImagesFromStorage,

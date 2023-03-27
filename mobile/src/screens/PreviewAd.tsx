@@ -24,6 +24,7 @@ import { AdDetails } from '@components/AdDetails'
 
 type RouteParams = {
   productId: string
+  isEditing?: boolean
 }
 
 export function PreviewAd() {
@@ -37,12 +38,16 @@ export function PreviewAd() {
 
   const route = useRoute()
   const toast = useToast()
-  const { productId } = route.params as RouteParams
+  const { productId, isEditing } = route.params as RouteParams
 
   const navigation = useNavigation<AppStackNavigationRoutesProps>()
 
   function handleGoBackAndEdit() {
     navigation.navigate('new', { id: productId })
+  }
+
+  function handleGoToEdit() {
+    navigation.navigate('edit', { id: productId })
   }
 
   async function handlePublishAd() {
@@ -123,7 +128,7 @@ export function PreviewAd() {
           hasIcon
           iconType={AntDesign}
           iconName="arrowleft"
-          onPress={handleGoBackAndEdit}
+          onPress={isEditing ? handleGoToEdit : handleGoBackAndEdit}
         />
         <Button
           flex={1}

@@ -10,7 +10,7 @@ import { Loading } from '@components/Loading'
 
 export function Routes() {
   const { colors } = useTheme()
-  const { user, isLoadingUserStorageData } = useAuth()
+  const { user, refreshedToken, isLoadingUserStorageData } = useAuth()
 
   const theme = DefaultTheme
   theme.colors.background = colors.gray[600]
@@ -22,7 +22,7 @@ export function Routes() {
   return (
     <Box flex={1} bg="gray.600">
       <NavigationContainer theme={theme}>
-        {user.id ? <AppStackRoutes /> : <AuthRoutes />}
+        {user.id || refreshedToken ? <AppStackRoutes /> : <AuthRoutes />}
       </NavigationContainer>
     </Box>
   )

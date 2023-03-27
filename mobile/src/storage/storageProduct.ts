@@ -57,12 +57,10 @@ export async function storageImagesGet() {
 }
 
 export async function storageImagesRemove(ids: string[]) {
-  const storage = await AsyncStorage.getItem(PRODUCT_IMAGES_STORAGE)
+  const storage = await storageImagesGet()
 
   const filteredImages = storage
-    ? JSON.parse(storage).filter((img: ProductImageDTO) =>
-        ids.map(item => item !== img.id)
-      )
+    ? storage.filter(image => !ids.includes(image.id))
     : storage
 
   await AsyncStorage.setItem(

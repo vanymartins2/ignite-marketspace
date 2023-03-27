@@ -44,10 +44,17 @@ export function Home() {
   const tabNavigation = useNavigation<AppTabsNavigationRoutesProps>()
 
   const { user, refreshedToken } = useAuth()
-  const { appliedFilterOptions, activeAdsQuantity, loadProductsFromUser } =
-    useProduct()
+  const {
+    appliedFilterOptions,
+    loadProductsFromUser,
+    userProducts,
+    isLoadingDataFromStorage
+  } = useProduct()
 
   const nameWithoutSurname = user.name.split(' ')[0]
+  const activeAdsQuantity = userProducts.filter(
+    product => product.is_active
+  ).length
 
   function handleOpenNewAd() {
     navigation.navigate('new', { id: undefined })
@@ -113,13 +120,15 @@ export function Home() {
     }
   }
 
-  useEffect(() => {
-    fetchAllProducts()
-  }, [])
-
   useFocusEffect(
     useCallback(() => {
       loadProductsFromUser()
+    }, [refreshedToken, activeAdsQuantity])
+  )
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchAllProducts()
     }, [refreshedToken])
   )
 
@@ -232,7 +241,9 @@ export function Home() {
           <Filter isOpen={isOpen} onClose={onClose} />
         </VStack>
 
-        {!isLoading ? (
+        {isLoading ? (
+          <Loading mt={8} />
+        ) : (
           <FlatList
             data={
               Object.keys(appliedFilterOptions).length > 0 && isLoading
@@ -261,8 +272,6 @@ export function Home() {
               </Text>
             )}
           />
-        ) : (
-          <Loading mt={8} />
         )}
       </VStack>
     </VStack>

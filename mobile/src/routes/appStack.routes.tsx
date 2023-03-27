@@ -16,7 +16,7 @@ type AppStackRoutes = {
   new: { id?: string }
   edit: { id: string }
   details: { id: string }
-  preview: { productId: string }
+  preview: { productId: string; isEditing?: boolean }
   'my-ad-details': { productId: string }
 }
 
