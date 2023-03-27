@@ -1,5 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 
+import { BASE_URL, API_PORT } from '@env'
+
 import { AppError } from '@utils/AppError'
 import {
   storageAuthTokenGet,
@@ -26,7 +28,7 @@ type APIInstanceProps = AxiosInstance & {
 }
 
 const api = axios.create({
-  baseURL: 'http://192.168.2.13:3333'
+  baseURL: `${BASE_URL}:${API_PORT}`
 }) as APIInstanceProps
 
 let isRefreshing = false

@@ -25,6 +25,7 @@
     "react-hook-form": "^7.41.5",
     "react-native": "0.70.5",
     "react-native-currency-input": "^1.1.0",
+    "react-native-dotenv": "^3.4.8",
     "react-native-format-currency": "^0.0.3",
     "react-native-safe-area-context": "4.4.1",
     "react-native-screens": "~3.18.0",
