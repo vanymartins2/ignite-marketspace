@@ -5,14 +5,12 @@ import {
   IPressableProps,
   Pressable,
   Text,
-  VStack,
-  useTheme
+  VStack
 } from 'native-base'
 
 import { ProductDetails } from '@dtos/productResponseDTO'
 
 import userImg from '@assets/userDefault.png'
-import bicicleImg from '@assets/bicicle.png'
 
 import { UserPhoto } from '@components/UserPhoto'
 import { api } from '@services/api'

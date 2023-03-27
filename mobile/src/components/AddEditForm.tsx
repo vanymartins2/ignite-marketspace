@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Platform } from 'react-native'
 import {
   Box,
@@ -29,7 +29,6 @@ import { AppError } from '@utils/AppError'
 import { useAuth } from '@hooks/useAuth'
 import { useProduct } from '@hooks/useProduct'
 import { ProductDetails } from '@dtos/productResponseDTO'
-import { ProductImageDTO } from '@dtos/productImageDTO'
 
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -72,7 +71,6 @@ export function AddEditForm() {
   const [isEditing, setIsEditing] = useState(false)
   const [photoIsLoading, setPhotoIsLoading] = useState(false)
   const [photoFiles, setPhotoFiles] = useState<any[]>([])
-  const [photos, setPhotos] = useState<ProductImageDTO[]>([])
   const [productImagesIds, setProductImagesIds] = useState<string[]>([])
   const [currentAd, setCurrentAd] = useState<ProductDetails>(
     {} as ProductDetails

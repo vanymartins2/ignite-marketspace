@@ -1,9 +1,9 @@
-import { HStack, Icon, Pressable, Text } from 'native-base'
+import { TouchableOpacity } from 'react-native'
+import { HStack, Icon, Text } from 'native-base'
 
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import { BackButton } from '@components/BackButton'
-import { TouchableOpacity } from 'react-native'
 
 type Props = {
   title?: string

@@ -1,7 +1,6 @@
 import { Pressable, Image, Icon, IPressableProps } from 'native-base'
 
 import { AntDesign } from '@expo/vector-icons'
-import { api } from '@services/api'
 
 type Props = IPressableProps & {
   uri?: string

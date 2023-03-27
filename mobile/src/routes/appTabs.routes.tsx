@@ -1,5 +1,5 @@
 import { Platform } from 'react-native'
-import { Icon, Pressable, useTheme } from 'native-base'
+import { Icon, useTheme } from 'native-base'
 
 import {
   createBottomTabNavigator,

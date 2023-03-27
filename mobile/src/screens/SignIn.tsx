@@ -1,21 +1,21 @@
 import { useState } from 'react'
 import { ScrollView, Center, Text, VStack, Box, useToast } from 'native-base'
 
-import { useNavigation } from '@react-navigation/native'
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes'
+import { useNavigation } from '@react-navigation/native'
 
-import { useAuth } from '@hooks/useAuth'
 import { AppError } from '@utils/AppError'
+import { useAuth } from '@hooks/useAuth'
 
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
-import LogoSvg from '@assets/logo.svg'
 import MarketSpaceSvg from '@assets/marketspace.svg'
+import LogoSvg from '@assets/logo.svg'
 
-import { Input } from '@components/Input'
 import { Button } from '@components/Button'
+import { Input } from '@components/Input'
 
 type FormData = {
   email: string

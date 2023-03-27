@@ -15,9 +15,9 @@ import { AntDesign } from '@expo/vector-icons'
 
 import { useProduct } from '@hooks/useProduct'
 
-import { Tag } from '@components/Tag'
-import { Button } from '@components/Button'
 import { Checkbox } from '@components/Checkbox'
+import { Button } from '@components/Button'
+import { Tag } from '@components/Tag'
 
 type Props = {
   isOpen: boolean

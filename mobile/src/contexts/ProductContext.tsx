@@ -25,16 +25,16 @@ type ProductContextProviderProps = {
 export type ProductContextDataProps = {
   userProducts: ProductDetails[]
   storedImages: ProductImageDTO[]
-  loadImagesFromStorage: () => Promise<void>
-  loadProductsFromUser: () => Promise<void>
-  addFilterOptions: (data: FilterDTO) => void
-  removeFilterOptions: () => void
-  appliedFilterOptions: FilterDTO
   isLoadingDataFromStorage: boolean
-  saveImagesInStorage: (images: ProductImageDTO[]) => Promise<void>
-  removeProductFromStorage: (id: string) => Promise<void>
+  appliedFilterOptions: FilterDTO
+  removeFilterOptions: () => void
+  addFilterOptions: (data: FilterDTO) => void
+  loadProductsFromUser: () => Promise<void>
   editProductInStorage: (id: string, is_active: boolean) => void
   saveProductInStorage: (productData: ProductDetails) => Promise<void>
+  removeProductFromStorage: (id: string) => Promise<void>
+  loadImagesFromStorage: () => Promise<void>
+  saveImagesInStorage: (images: ProductImageDTO[]) => Promise<void>
   removeImagesFromStorage: (ids: string[]) => Promise<void>
 }
 
@@ -132,17 +132,17 @@ export function ProductContextProvider({
       value={{
         userProducts,
         storedImages,
-        loadImagesFromStorage,
-        loadProductsFromUser,
-        addFilterOptions,
-        removeFilterOptions,
-        appliedFilterOptions,
         isLoadingDataFromStorage,
-        saveImagesInStorage,
-        removeImagesFromStorage,
+        appliedFilterOptions,
+        removeFilterOptions,
+        addFilterOptions,
+        loadProductsFromUser,
         saveProductInStorage,
+        editProductInStorage,
         removeProductFromStorage,
-        editProductInStorage
+        loadImagesFromStorage,
+        saveImagesInStorage,
+        removeImagesFromStorage
       }}
     >
       {children}

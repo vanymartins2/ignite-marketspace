@@ -10,17 +10,17 @@ import { AppStackNavigationRoutesProps } from '@routes/appStack.routes'
 
 import { Feather, AntDesign } from '@expo/vector-icons'
 
-import { api } from '@services/api'
-import { AppError } from '@utils/AppError'
 import { ProductDetails } from '@dtos/productResponseDTO'
+import { AppError } from '@utils/AppError'
+import { api } from '@services/api'
 
-import { useAuth } from '@hooks/useAuth'
 import { useProduct } from '@hooks/useProduct'
+import { useAuth } from '@hooks/useAuth'
 
-import { Button } from '@components/Button'
-import { Loading } from '@components/Loading'
-import { RNSwiper } from '@components/RNSwiper'
 import { AdDetails } from '@components/AdDetails'
+import { RNSwiper } from '@components/RNSwiper'
+import { Loading } from '@components/Loading'
+import { Button } from '@components/Button'
 
 type RouteParams = {
   productId: string

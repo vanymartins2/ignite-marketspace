@@ -16,14 +16,14 @@ import { AppStackNavigationRoutesProps } from '@routes/appStack.routes'
 
 import { AntDesign, Feather } from '@expo/vector-icons'
 
-import { AppError } from '@utils/AppError'
 import { ProductDetails } from '@dtos/productResponseDTO'
+import { AppError } from '@utils/AppError'
 
-import { useAuth } from '@hooks/useAuth'
 import { useProduct } from '@hooks/useProduct'
+import { useAuth } from '@hooks/useAuth'
 
-import { AdCard } from '@components/AdCard'
 import { Loading } from '@components/Loading'
+import { AdCard } from '@components/AdCard'
 
 export function Ads() {
   const [isLoading, setIsLoading] = useState(false)

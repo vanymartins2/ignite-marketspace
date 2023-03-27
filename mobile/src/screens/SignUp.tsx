@@ -16,24 +16,24 @@ import { useNavigation } from '@react-navigation/native'
 
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
-import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
+import * as FileSystem from 'expo-file-system'
 
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
 import { useAuth } from '@hooks/useAuth'
 
-import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
+import { api } from '@services/api'
 
-import LogoSvg from '@assets/logo.svg'
 import userDefaultPhoto from '@assets/userDefault.png'
+import LogoSvg from '@assets/logo.svg'
 
-import { Input } from '@components/Input'
-import { Button } from '@components/Button'
 import { UserPhoto } from '@components/UserPhoto'
+import { Button } from '@components/Button'
+import { Input } from '@components/Input'
 
 type FormDataProps = {
   name: string
@@ -162,7 +162,7 @@ export function SignUp() {
       const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : 'Não foi possível cadastrar os dados. Tente novamente mais tarde.'
+        : 'Não foi possível cadastrar o usuário. Tente novamente mais tarde.'
 
       toast.show({
         title,

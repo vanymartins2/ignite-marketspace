@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
   FlatList,
   HStack,
@@ -12,25 +12,25 @@ import {
 
 import { AntDesign, Feather } from '@expo/vector-icons'
 
-import { AppTabsNavigationRoutesProps } from '@routes/appTabs.routes'
-import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { AppStackNavigationRoutesProps } from '@routes/appStack.routes'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
+import { AppTabsNavigationRoutesProps } from '@routes/appTabs.routes'
 
-import { useAuth } from '@hooks/useAuth'
 import { useProduct } from '@hooks/useProduct'
+import { useAuth } from '@hooks/useAuth'
 
-import { api } from '@services/api'
-import { AppError } from '@utils/AppError'
 import { ProductDetails } from '@dtos/productResponseDTO'
+import { AppError } from '@utils/AppError'
+import { api } from '@services/api'
 
 import userDefaultPhoto from '@assets/userDefault.png'
 
-import { Input } from '@components/Input'
-import { Filter } from '@components/Filter'
-import { Button } from '@components/Button'
-import { AdCard } from '@components/AdCard'
-import { Loading } from '@components/Loading'
 import { UserPhoto } from '@components/UserPhoto'
+import { Loading } from '@components/Loading'
+import { AdCard } from '@components/AdCard'
+import { Button } from '@components/Button'
+import { Filter } from '@components/Filter'
+import { Input } from '@components/Input'
 
 export function Home() {
   const [isLoading, setIsLoading] = useState(false)
@@ -44,12 +44,8 @@ export function Home() {
   const tabNavigation = useNavigation<AppTabsNavigationRoutesProps>()
 
   const { user, refreshedToken } = useAuth()
-  const {
-    appliedFilterOptions,
-    loadProductsFromUser,
-    userProducts,
-    isLoadingDataFromStorage
-  } = useProduct()
+  const { appliedFilterOptions, loadProductsFromUser, userProducts } =
+    useProduct()
 
   const nameWithoutSurname = user.name.split(' ')[0]
   const activeAdsQuantity = userProducts.filter(

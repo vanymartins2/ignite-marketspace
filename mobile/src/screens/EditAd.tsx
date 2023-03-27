@@ -1,7 +1,7 @@
-import { Box, ScrollView, Text } from 'native-base'
+import { Box, ScrollView } from 'native-base'
 
-import { useNavigation } from '@react-navigation/native'
 import { AppTabsNavigationRoutesProps } from '@routes/appTabs.routes'
+import { useNavigation } from '@react-navigation/native'
 
 import { AddEditForm } from '@components/AddEditForm'
 import { Header } from '@components/Header'

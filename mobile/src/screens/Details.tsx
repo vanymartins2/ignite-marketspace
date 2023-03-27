@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react'
 import { Linking } from 'react-native'
+
 import { Box, HStack, Text, ScrollView, useToast, Center } from 'native-base'
+
 import {
   useNavigation,
   useRoute,
@@ -9,16 +11,16 @@ import {
 
 import { FontAwesome } from '@expo/vector-icons'
 
-import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
+import { api } from '@services/api'
 
 import { ProductDetails } from '@dtos/productResponseDTO'
 
+import { AdDetails } from '@components/AdDetails'
+import { RNSwiper } from '@components/RNSwiper'
+import { Loading } from '@components/Loading'
 import { Header } from '@components/Header'
 import { Button } from '@components/Button'
-import { Loading } from '@components/Loading'
-import { RNSwiper } from '@components/RNSwiper'
-import { AdDetails } from '@components/AdDetails'
 
 type RouteParams = {
   id: string

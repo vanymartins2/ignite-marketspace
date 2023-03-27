@@ -11,18 +11,18 @@ import { AppStackNavigationRoutesProps } from '@routes/appStack.routes'
 
 import { Feather } from '@expo/vector-icons'
 
-import { useAuth } from '@hooks/useAuth'
 import { useProduct } from '@hooks/useProduct'
+import { useAuth } from '@hooks/useAuth'
 
-import { api } from '@services/api'
-import { AppError } from '@utils/AppError'
 import { ProductDetails } from '@dtos/productResponseDTO'
+import { AppError } from '@utils/AppError'
+import { api } from '@services/api'
 
+import { AdDetails } from '@components/AdDetails'
+import { RNSwiper } from '@components/RNSwiper'
+import { Loading } from '@components/Loading'
 import { Header } from '@components/Header'
 import { Button } from '@components/Button'
-import { Loading } from '@components/Loading'
-import { RNSwiper } from '@components/RNSwiper'
-import { AdDetails } from '@components/AdDetails'
 
 type RouteParams = {
   productId: string
@@ -70,7 +70,7 @@ export function MyAdDetails() {
       const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : 'Não foi possível alterar a visualização do anúncio.'
+        : 'Não foi possível desabilitar o anúncio.'
 
       toast.show({
         title,
@@ -99,7 +99,7 @@ export function MyAdDetails() {
       const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : 'Não foi possível alterar a visualização do anúncio.'
+        : 'Não foi possível habilitar o anúncio.'
 
       toast.show({
         title,
@@ -128,7 +128,7 @@ export function MyAdDetails() {
       const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : 'Não foi possível carregar a pré-visualização.'
+        : 'Não foi possível remover o anúncio. Tente novamente mais tarde.'
 
       toast.show({
         title,
@@ -150,7 +150,7 @@ export function MyAdDetails() {
       const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : 'Não foi possível carregar a pré-visualização.'
+        : 'Não foi possível carregar os detalhes do anúncio.'
 
       toast.show({
         title,

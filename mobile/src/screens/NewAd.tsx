@@ -1,10 +1,10 @@
 import { Box, ScrollView } from 'native-base'
 
-import { useNavigation } from '@react-navigation/native'
 import { AppTabsNavigationRoutesProps } from '@routes/appTabs.routes'
+import { useNavigation } from '@react-navigation/native'
 
-import { Header } from '@components/Header'
 import { AddEditForm } from '@components/AddEditForm'
+import { Header } from '@components/Header'
 
 export function NewAd() {
   const navigation = useNavigation<AppTabsNavigationRoutesProps>()
